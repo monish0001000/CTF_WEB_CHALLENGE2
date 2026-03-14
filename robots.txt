@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/v1/
+Disallow: /backup/
+Disallow: /static/config.js
+Disallow: /.git/
+
+# Sitemap: https://nexuscorp.internal/sitemap.xml

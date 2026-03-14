@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS CORP — Secure Employee Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #050a0f;
+    --panel: #0a1520;
+    --border: #0d3a5c;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --green: #00ff88;
+    --red: #ff3355;
+    --text: #c8e6f0;
+    --muted: #4a7a99;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(0,80,120,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.05) 0%, transparent 50%);
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,21,32,0.9);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--accent2); }
+
+  .status-bar {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: flex;
+    gap: 20px;
+  }
+  .status-bar .live::before {
+    content: '● ';
+    color: var(--green);
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .container {
+    max-width: 960px;
+    margin: 60px auto;
+    padding: 0 24px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(0,212,255,0.4);
+    margin-bottom: 10px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 2px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+
+  .panel-title {
+    font-size: 0.7rem;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-group { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,212,255,0.15);
+  }
+
+  .btn {
+    padding: 12px 32px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 20px rgba(0,212,255,0.4);
+  }
+  .btn-danger {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .btn-danger:hover {
+    background: var(--accent2);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255,107,53,0.4);
+  }
+
+  #message {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    padding: 12px 16px;
+    border-radius: 2px;
+    margin-top: 16px;
+    display: none;
+  }
+  #message.success {
+    background: rgba(0,255,136,0.08);
+    border: 1px solid var(--green);
+    color: var(--green);
+    display: block;
+  }
+  #message.error {
+    background: rgba(255,51,85,0.08);
+    border: 1px solid var(--red);
+    color: var(--red);
+    display: block;
+  }
+  #message.info {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    display: block;
+  }
+
+  .employee-card {
+    display: none;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .employee-card.visible { display: block; }
+  .employee-card h3 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+  }
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(13,58,92,0.5);
+    font-size: 0.88rem;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-label { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; }
+  .field-value { color: var(--text); }
+  .field-value.highlight { color: var(--green); font-family: 'Share Tech Mono', monospace; }
+  .field-value.redacted { color: var(--red); font-family: 'Share Tech Mono', monospace; }
+
+  .notice-box {
+    background: rgba(255,107,53,0.06);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 2px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .hint-block {
+    margin-top: 30px;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .token-display {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    background: rgba(0,0,0,0.5);
+    padding: 10px;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    margin-top: 8px;
+    border-radius: 2px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(74,122,153,0.4);
+    letter-spacing: 2px;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* Hidden comment visible in source */
+  /* DEBUG: API endpoint /api/v1/employees?id= — dev testing only */
+  /* JWT secret rotated? Check /static/config.js — old key: n3xus_s3cr3t_2019 */
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NEXUS<span>CORP</span></div>
+  <div class="status-bar">
+    <span class="live">SYSTEM ONLINE</span>
+    <span>BUILD 4.1.7</span>
+    <span id="clock"></span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>EMPLOYEE PORTAL</h1>
+    <p>// AUTHORIZED ACCESS ONLY — NEXUS INTERNAL NETWORK //</p>
+  </div>
+
+  <div class="notice-box">
+    ⚠ SECURITY NOTICE: This portal enforces strict access controls. All activity is logged.
+    Employee records are accessible only to authenticated personnel.
+    Unauthorized access attempts will be prosecuted under §18 U.S.C. 1030.
+  </div>
+
+  <!-- STAGE 1: Login Panel -->
+  <div class="panel" id="loginPanel">
+    <div class="panel-title">// AUTHENTICATION</div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="employee_id" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="off">
+      </div>
+    </div>
+    <button class="btn" onclick="doLogin()">AUTHENTICATE →</button>
+    <div id="loginMsg"></div>
+
+    <div class="hint-block">
+      PORTAL v4.1 — For login assistance contact IT helpdesk at ext. 4400.<br>
+      Default credentials disabled. Contact HR if locked out.<br>
+      <!-- robots.txt lists sensitive paths — check before crawling -->
+    </div>
+  </div>
+
+  <!-- STAGE 2: Employee Lookup (visible after login) -->
+  <div class="panel" id="lookupPanel" style="display:none">
+    <div class="panel-title">// EMPLOYEE RECORD LOOKUP</div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:20px;">
+      Welcome, <span id="welcomeUser" style="color:var(--accent);font-family:'Share Tech Mono',monospace"></span>.
+      Your clearance level: <span id="clearanceLevel" style="color:var(--accent2);font-family:'Share Tech Mono',monospace"></span>
+    </p>
+    <div class="form-group">
+      <label>Employee ID</label>
+      <input type="number" id="empId" placeholder="e.g. 1001" min="1000" max="9999">
+    </div>
+    <button class="btn" onclick="lookupEmployee()">RETRIEVE RECORD →</button>
+    &nbsp;
+    <button class="btn btn-danger" onclick="doLogout()">LOGOUT</button>
+
+    <div id="lookupMsg"></div>
+    <div class="employee-card" id="empCard">
+      <h3>// EMPLOYEE RECORD</h3>
+      <div id="empData"></div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: Flag panel (only for admin) -->
+  <div class="panel" id="flagPanel" style="display:none">
+    <div class="panel-title">// CLASSIFIED — ADMIN ONLY</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--muted);margin-bottom:16px;">
+      CLEARANCE LEVEL 9 REQUIRED. TOKEN VERIFIED.
+    </div>
+    <div id="flagDisplay" style="font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--green);letter-spacing:3px;padding:20px;background:rgba(0,255,136,0.05);border:1px solid var(--green);border-radius:2px;text-align:center;text-shadow:0 0 20px rgba(0,255,136,0.5);">
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  NEXUS CORPORATION INTERNAL SYSTEMS — © 2024 — ALL RIGHTS RESERVED<br>
+  UNAUTHORIZED ACCESS IS PROHIBITED AND MONITORED
+</footer>
+
+<script>
+// =========================================================
+//  NEXUS CORP PORTAL — CLIENT-SIDE APPLICATION
+//  Version 4.1.7
+// =========================================================
+
+// JWT-like token utility (simplified base64 encoding for demo)
+const TokenUtil = {
+  encode: (payload) => btoa(JSON.stringify(payload)),
+  decode: (token) => {
+    try { return JSON.parse(atob(token)); }
+    catch(e) { return null; }
+  }
+};
+
+// User database (stored in JS — intentional vulnerability: client-side auth)
+const USERS = {
+  "john.doe":    { password: "Welcome1!", role: "employee", clearance: 2, id: 1001 },
+  "alice.wang":  { password: "Al1ce#Corp", role: "employee", clearance: 3, id: 1002 },
+  "bob.smith":   { password: "B0bSmith99", role: "employee", clearance: 2, id: 1003 },
+  "admin":       { password: "Tr0ub4dor&3", role: "admin",    clearance: 9, id: 9999 },
+};
+
+// Employee records database
+const EMPLOYEES = {
+  1001: { name: "John Doe",      dept: "Engineering",  salary: "$82,000",  ssn: "XXX-XX-1234", clearance: 2 },
+  1002: { name: "Alice Wang",    dept: "Research",     salary: "$95,000",  ssn: "XXX-XX-5678", clearance: 3 },
+  1003: { name: "Bob Smith",     dept: "Operations",   salary: "$76,000",  ssn: "XXX-XX-9012", clearance: 2 },
+  1004: { name: "Carol Davis",   dept: "HR",           salary: "$88,000",  ssn: "XXX-XX-3456", clearance: 3 },
+  1005: { name: "Eve Torres",    dept: "Security",     salary: "$110,000", ssn: "XXX-XX-7890", clearance: 5 },
+  9999: { name: "SYSTEM ADMIN",  dept: "NEXUS CORE",   salary: "[CLASSIFIED]", ssn: "[CLASSIFIED]", clearance: 9 },
+};
+
+// *** VULNERABILITY 1: JWT secret hardcoded ***
+const JWT_SECRET = "n3xus_s3cr3t_2019"; // TODO: move to env
+
+// Session state
+let currentSession = null;
+
+// *** VULNERABILITY 2: Insecure token — role/clearance stored client-side ***
+function createToken(username, role, clearance) {
+  const payload = {
+    sub: username,
+    role: role,
+    clearance: clearance,
+    iat: Date.now(),
+    // signature is just secret XOR'd with sub — easily forged
+    sig: btoa(JWT_SECRET + username)
+  };
+  return TokenUtil.encode(payload);
+}
+
+function verifyToken(token) {
+  const payload = TokenUtil.decode(token);
+  if (!payload) return null;
+  // Verification: only checks sig format, not content — IDOR possible
+  const expectedSig = btoa(JWT_SECRET + payload.sub);
+  if (payload.sig !== expectedSig) return null;
+  return payload;
+}
+
+// *** VULNERABILITY 3: Broken access control on employee lookup ***
+function lookupEmployee() {
+  const empId = parseInt(document.getElementById('empId').value);
+  const msg = document.getElementById('lookupMsg');
+  const card = document.getElementById('empCard');
+  const empData = document.getElementById('empData');
+
+  if (!currentSession) {
+    showMsg(msg, 'error', 'SESSION EXPIRED. PLEASE RE-AUTHENTICATE.');
+    return;
+  }
+
+  // Access control check — BROKEN: checks clearance from client-controlled token
+  const token = localStorage.getItem('nx_session');
+  const payload = verifyToken(token);
+
+  if (!payload) {
+    showMsg(msg, 'error', 'INVALID SESSION TOKEN.');
+    return;
+  }
+
+  const employee = EMPLOYEES[empId];
+  if (!employee) {
+    showMsg(msg, 'error', `NO RECORD FOUND FOR ID: ${empId}`);
+    card.classList.remove('visible');
+    return;
+  }
+
+  // *** BAC: employee clearance vs user clearance comparison is bypassable ***
+  if (payload.clearance < employee.clearance) {
+    showMsg(msg, 'error', `ACCESS DENIED — INSUFFICIENT CLEARANCE (NEED LEVEL ${employee.clearance}, HAVE ${payload.clearance})`);
+    card.classList.remove('visible');
+    return;
+  }
+
+  // Show record
+  msg.style.display = 'none';
+  card.classList.add('visible');
+
+  let sensitiveFields = '';
+  if (payload.clearance >= 5) {
+    sensitiveFields = `
+      <div class="field-row"><span class="field-label">SSN</span><span class="field-value highlight">${employee.ssn}</span></div>
+      <div class="field-row"><span class="field-label">SALARY</span><span class="field-value highlight">${employee.salary}</span></div>
+    `;
+  } else {
+    sensitiveFields = `
+      <div class="field-row"><span class="field-label">SSN</span><span class="field-value redacted">[CLEARANCE 5+ REQUIRED]</span></div>
+      <div class="field-row"><span class="field-label">SALARY</span><span class="field-value redacted">[CLEARANCE 5+ REQUIRED]</span></div>
+    `;
+  }
+
+  empData.innerHTML = `
+    <div class="field-row"><span class="field-label">EMP ID</span><span class="field-value">${empId}</span></div>
+    <div class="field-row"><span class="field-label">NAME</span><span class="field-value">${employee.name}</span></div>
+    <div class="field-row"><span class="field-label">DEPARTMENT</span><span class="field-value">${employee.dept}</span></div>
+    <div class="field-row"><span class="field-label">CLEARANCE LEVEL</span><span class="field-value">${employee.clearance}</span></div>
+    ${sensitiveFields}
+  `;
+
+  // If admin record viewed by admin — show flag
+  if (empId === 9999 && payload.role === 'admin') {
+    showFlag();
+  }
+}
+
+function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('loginMsg');
+
+  const user = USERS[username];
+  if (!user || user.password !== password) {
+    showMsg(msg, 'error', 'AUTHENTICATION FAILED — INVALID CREDENTIALS');
+    // *** VULNERABILITY 4: verbose error doesn't distinguish user vs pass ***
+    return;
+  }
+
+  const token = createToken(username, user.role, user.clearance);
+  localStorage.setItem('nx_session', token);
+  currentSession = { username, ...user };
+
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('lookupPanel').style.display = 'block';
+  document.getElementById('welcomeUser').textContent = username;
+  document.getElementById('clearanceLevel').textContent = `LEVEL ${user.clearance}`;
+}
+
+function doLogout() {
+  localStorage.removeItem('nx_session');
+  currentSession = null;
+  document.getElementById('loginPanel').style.display = 'block';
+  document.getElementById('lookupPanel').style.display = 'none';
+  document.getElementById('flagPanel').style.display = 'none';
+}
+
+function showFlag() {
+  const flagPanel = document.getElementById('flagPanel');
+  flagPanel.style.display = 'block';
+  document.getElementById('flagDisplay').textContent = 'CTF{br0k3n_4cc3ss_c0ntr0l_n3xus_0wn3d}';
+}
+
+function showMsg(el, type, text) {
+  el.className = type;
+  el.textContent = `[${new Date().toISOString()}] ${text}`;
+  el.style.display = 'block';
+}
+
+// Clock
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toUTCString().split(' ').slice(4,5)[0] + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Auto-restore session
+window.onload = () => {
+  const token = localStorage.getItem('nx_session');
+  if (token) {
+    const payload = verifyToken(token);
+    if (payload) {
+      const user = USERS[payload.sub];
+      if (user) {
+        currentSession = { username: payload.sub, ...user };
+        document.getElementById('loginPanel').style.display = 'none';
+        document.getElementById('lookupPanel').style.display = 'block';
+        document.getElementById('welcomeUser').textContent = payload.sub;
+        document.getElementById('clearanceLevel').textContent = `LEVEL ${payload.clearance}`;
+      }
+    }
+  }
+};
+</script>
+</body>
+</html>
